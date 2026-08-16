@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyBudget - Complete Project</title>
+<style>
+.page-section { display:none; }
+.transaction{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 0;
+    border-bottom:1px solid #eee;
+}
+
+.transaction:last-child{
+    border-bottom:none;
+}
+
+.transaction-left{
+    /* layout for left side of a transaction; defined later as well */
+}
+
+.add-btn{
+    background:#16a34a;
+    color:white;
+    border:none;
+    padding:11px 17px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.add-btn:hover{
+    background:#15803d;
+}
+
+/* FILTERS */
+
+.filter-box{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:18px;
+    margin-bottom:20px;
+    display:grid;
+    grid-template-columns:2fr 1fr 1fr;
+    gap:12px;
+}
+
+.filter-box input,
+.filter-box select{
+    width:100%;
+    padding:11px;
+    border:1px solid #d1d5db;
+    border-radius:7px;
+    outline:none;
+    background:white;
+}
+
+.filter-box input:focus,
+.filter-box select:focus{
+    border-color:#16a34a;
+}
+
+/* TRANSACTIONS */
+
+.transaction-section{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    overflow:hidden;
+}
+
+.section-header{
+    padding:20px;
+    border-bottom:1px solid #eeeeee;
+}
+
+.section-header h2{
+    font-size:18px;
+}
+
+.transaction{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:17px 20px;
+    border-bottom:1px solid #eeeeee;
+}
+
+.transaction:last-child{
+    border-bottom:none;
+}
+
+.transaction-left{
+    display:flex;
+    align-items:center;
+    gap:13px;
+}
+
+.transaction-icon{
+    width:42px;
+    height:42px;
+    border-radius:10px;
+    background:#f0fdf4;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+}
+
+.transaction-name{
+    font-weight:bold;
+    margin-bottom:5px;
+}
+
+.transaction-info{
+    color:#6b7280;
+    font-size:12px;
+}
+
+.amount{
+    font-weight:bold;
+}
+
+.income{
+    color:#16a34a;
+}
+
+.expense{
+    color:#dc2626;
+}
+
+.delete-btn{
+    border:none;
+    background:#fee2e2;
+    color:#dc2626;
+    padding:7px 9px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.delete-btn:hover{
+    background:#fecaca;
+}
+
+.amount-area{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+/* MODAL */
+
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    justify-content:center;
+    align-items:center;
+    z-index:100;
+}
+
+.modal-box{
+    width:420px;
+    max-width:90%;
+    background:white;
+    border-radius:12px;
+    padding:25px;
+}
+
+.modal-box h2{
+    margin-bottom:20px;
+}
+
+.form-group{
+    margin-bottom:16px;
+}
+
+.form-group label{
+    display:block;
+    font-size:12px;
+    font-weight:bold;
+    margin-bottom:7px;
+}
+
+.form-group input,
+.form-group select{
+    width:100%;
+    padding:11px;
+    border:1px solid #d1d5db;
+    border-radius:7px;
+    outline:none;
+}
+
+.form-group input:focus,
+.form-group select:focus{
+    border-color:#16a34a;
+}
+
+.buttons{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:20px;
+}
+
+.cancel-btn{
+    border:none;
+    background:#e5e7eb;
+    padding:10px 16px;
+    border-radius:7px;
+    cursor:pointer;
+}
+
+.save-btn{
+    border:none;
+    background:#16a34a;
+    color:white;
+    padding:10px 16px;
+    border-radius:7px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.empty{
+    padding:35px;
+    text-align:center;
+    color:#6b7280;
+}
+
+/* MOBILE */
+
+@media(max-width:800px){
+
+    .sidebar{
+        width:70px;
+        padding:20px 8px;
+    }
+
+    .logo{
+        font-size:0;
+    }
+
+    .logo span{
+        font-size:20px;
+    }
+
+    .nav-item{
+        justify-content:center;
+    }
+
+    .nav-item span:not(.icon),
+    .menu-title{
+        display:none;
+    }
+
+    .main{
+        margin-left:70px;
+        width:calc(100% - 70px);
+    }
+
+    .page-header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:15px;
+    }
+
+    .filter-box{
+        grid-template-columns:1fr;
+    }
+
+    .transaction{
+        gap:10px;
+    }
+
+    .amount-area{
+        gap:7px;
+    }
+
+}
+
+
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f5f7fb;
+    color:#1f2937;
+}
+
+.app{
+    display:flex;
+    min-height:100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:230px;
+    height:100vh;
+    position:fixed;
+    background:#111827;
+    color:white;
+    padding:25px 18px;
+}
+
+.logo{
+    font-size:25px;
+    font-weight:bold;
+    margin-bottom:40px;
+    padding-left:10px;
+}
+
+.logo span{
+    color:#22c55e;
+}
+
+.menu-title{
+    font-size:11px;
+    color:#9ca3af;
+    margin:20px 10px 10px;
+    text-transform:uppercase;
+}
+
+.nav-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px;
+    margin:5px 0;
+    border-radius:8px;
+    color:#d1d5db;
+    cursor:pointer;
+}
+
+.nav-item:hover,
+.nav-item.active{
+    background:#16a34a;
+    color:white;
+}
+
+.icon{
+    width:22px;
+    text-align:center;
+}
+
+/* MAIN */
+
+.main{
+    margin-left:230px;
+    width:calc(100% - 230px);
+}
+
+.topbar{
+    height:70px;
+    background:white;
+    border-bottom:1px solid #e5e7eb;
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    padding:0 30px;
+}
+
+.profile{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.avatar{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:#16a34a;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+}
+
+/* CONTENT */
+
+.content{
+    padding:30px;
+}
+
+.page-header{
+    margin-bottom:25px;
+}
+
+.page-header h1{
+    font-size:28px;
+    margin-bottom:6px;
+}
+
+.page-header p{
+    color:#6b7280;
+}
+
+/* BUDGET SUMMARY */
+
+.summary{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
+    margin-bottom:25px;
+}
+
+.card{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:20px;
+}
+
+.card-title{
+    color:#6b7280;
+    font-size:13px;
+    margin-bottom:10px;
+}
+
+.card-value{
+    font-size:24px;
+    font-weight:bold;
+}
+
+.green{
+    color:#16a34a;
+}
+
+/* BUDGET SECTION */
+
+.budget-section{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:20px;
+}
+
+.section-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.section-header h2{
+    font-size:18px;
+}
+
+.set-btn{
+    background:#16a34a;
+    color:white;
+    border:none;
+    padding:10px 15px;
+    border-radius:7px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+/* BUDGET ITEM */
+
+.budget-item{
+    padding:18px 0;
+    border-bottom:1px solid #eeeeee;
+}
+
+.budget-item:last-child{
+    border-bottom:none;
+}
+
+.budget-top{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:9px;
+}
+
+.category{
+    font-weight:bold;
+}
+
+.amount-text{
+    font-size:13px;
+    color:#6b7280;
+}
+
+.progress{
+    width:100%;
+    height:9px;
+    background:#e5e7eb;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.progress-bar{
+    height:100%;
+    background:#16a34a;
+    border-radius:10px;
+}
+
+.warning{
+    background:#f59e0b;
+}
+
+.danger{
+    background:#dc2626;
+}
+
+.remaining{
+    margin-top:7px;
+    color:#6b7280;
+    font-size:12px;
+}
+
+/* MODAL */
+
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    justify-content:center;
+    align-items:center;
+}
+
+.modal-box{
+    width:400px;
+    max-width:90%;
+    background:white;
+    border-radius:12px;
+    padding:25px;
+}
+
+.modal-box h2{
+    margin-bottom:20px;
+}
+
+.form-group{
+    margin-bottom:15px;
+}
+
+.form-group label{
+    display:block;
+    font-size:12px;
+    font-weight:bold;
+    margin-bottom:7px;
+}
+
+.form-group input,
+.form-group select{
+    width:100%;
+    padding:10px;
+    border:1px solid #d1d5db;
+    border-radius:7px;
+    outline:none;
+}
+
+.buttons{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:20px;
+}
+
+.cancel{
+    border:none;
+    background:#e5e7eb;
+    padding:10px 15px;
+    border-radius:7px;
+    cursor:pointer;
+}
+
+.save{
+    border:none;
+    background:#16a34a;
+    color:white;
+    padding:10px 15px;
+    border-radius:7px;
+    cursor:pointer;
+}
+
+/* MOBILE */
+
+@media(max-width:800px){
+
+    .sidebar{
+        width:70px;
+        padding:20px 8px;
+    }
+
+    .logo{
+        font-size:0;
+    }
+
+    .logo span{
+        font-size:20px;
+    }
+
+    .nav-item{
+        justify-content:center;
+    }
+
+    .nav-item span:not(.icon),
+    .menu-title{
+        display:none;
+    }
+
+    .main{
+        margin-left:70px;
+        width:calc(100% - 70px);
+    }
+
+    .page-header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:15px;
+    }
+
+    .summary{
+        grid-template-columns:1fr;
+    }
+
+}
+
+
+
+</style>
+</head>
+<body>
+<section class="page-section" id="page-index">
+
+
+<div class="app">
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+<div class="logo">
+My<span>Budget</span>
+</div>
+
+<div class="menu-title">
+Finance
+</div>
+
+<div class="nav-item active">
+<div class="icon">⌂</div>
+<span>Dashboard</span>
+</div>
+
+<div class="nav-item" onclick="go('transactions.html')">
+<div class="icon">₹</div>
+<span>Transactions</span>
+</div>
+
+<div class="nav-item" onclick="go('budget.html')">
+<div class="icon">▣</div>
+<span>Budgets</span>
+</div>
+
+<div class="nav-item" onclick="go('insights.html')">
+<div class="icon">◔</div>
+<span>Insights</span>
+</div>
+
+</aside>
+
+
+<!-- MAIN -->
+
+<main class="main">
+
+<header class="topbar">
+
+<input
+class="search"
+type="text"
+placeholder="Search..."
+>
+
+<div class="profile">
+
+<div class="avatar">
+RK
+</div>
+
+<div>
+<strong>Renuga Sri</strong>
+<br>
+<small>MyBudget User</small>
+</div>
+
+</div>
+
+</header>
+
+
+<section class="content">
+
+<!-- WELCOME -->
+
+<div class="welcome">
+
+<h1>Good Morning, Renuga Sri 👋</h1>
+
+<p>
+Here is your financial overview for this month.
+</p>
+
+</div>
+
+
+<!-- SUMMARY -->
+
+<div class="summary">
+
+<div class="card">
+
+<div class="card-title">
+Total Balance
+</div>
+
+<div class="card-value">
+₹46,200
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="card-title">
+Income
+</div>
+
+<div class="card-value green">
+₹50,000
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="card-title">
+Expenses
+</div>
+
+<div class="card-value red">
+₹3,800
+</div>
+
+</div>
+
+</div>
+
+
+<!-- QUICK ACTIONS -->
+
+<div class="quick-actions">
+
+<button
+class="action-btn expense-btn"
+onclick="go('transactions.html')">
+
++ Add Expense
+
+</button>
+
+<button
+class="action-btn budget-btn"
+onclick="go('budget.html')">
+
+Set Budget
+
+</button>
+
+</div>
+
+
+<!-- RECENT TRANSACTIONS -->
+
+<div class="section">
+
+<div class="section-header">
+
+<h2>
+Recent Transactions
+</h2>
+
+<button
+class="view-btn"
+onclick="go('transactions.html')">
+
+View All
+
+</button>
+
+</div>
+
+
+<div class="transaction">
+
+<div class="transaction-left">
+
+<div class="transaction-icon">
+🍔
+</div>
+
+<div>
+
+<div class="transaction-name">
+Food
+</div>
+
+<div class="transaction-category">
+Today
+</div>
+
+</div>
+
+</div>
+
+<div class="amount expense">
+- ₹250
+</div>
+
+</div>
+
+
+<div class="transaction">
+
+<div class="transaction-left">
+
+<div class="transaction-icon">
+🚌
+</div>
+
+<div>
+
+<div class="transaction-name">
+Transport
+</div>
+
+<div class="transaction-category">
+Yesterday
+</div>
+
+</div>
+
+</div>
+
+<div class="amount expense">
+- ₹120
+</div>
+
+</div>
+
+
+<div class="transaction">
+
+<div class="transaction-left">
+
+<div class="transaction-icon">
+💰
+</div>
+
+<div>
+
+<div class="transaction-name">
+Salary
+</div>
+
+<div class="transaction-category">
+01 Aug 2026
+</div>
+
+</div>
+
+</div>
+
+<div class="amount income">
++ ₹50,000
+</div>
+
+</div>
+
+
+<div class="transaction">
+
+<div class="transaction-left">
+
+<div class="transaction-icon">
+📚
+</div>
+
+<div>
+
+<div class="transaction-name">
+Education
+</div>
+
+<div class="transaction-category">
+05 Aug 2026
+</div>
+
+</div>
+
+</div>
+
+<div class="amount expense">
+- ₹1,200
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+
+<script>
+
+/* LOAD SHARED DATA */
+
+function getTransactions(){
+
+    return JSON.parse(
+        localStorage.getItem(
+            "myBudgetTransactions"
+        )
+    ) || [];
+
+}
+
+
+/* UPDATE DASHBOARD */
+
+function updateDashboard(){
+
+    const transactions =
+        getTransactions();
+
+
+    let income = 0;
+    let expenses = 0;
+
+
+    transactions.forEach(item => {
+
+        const amount =
+            Number(item.amount) || 0;
+
+
+        if(item.type === "income"){
+
+            income += amount;
+
+        }else{
+
+            expenses += amount;
+
+        }
+
+    });
+
+
+    const balance =
+        income - expenses;
+
+
+    /* SUMMARY CARDS */
+
+    const cards =
+        document.getElementById("page-index")?.querySelectorAll(".card-value") || [];
+
+
+    if(cards.length >= 3){
+
+        cards[0].innerText =
+            "₹" +
+            balance.toLocaleString("en-IN");
+
+        cards[1].innerText =
+            "₹" +
+            income.toLocaleString("en-IN");
+
+        cards[2].innerText =
+            "₹" +
+            expenses.toLocaleString("en-IN");
+
+    }
+
+
+    /* RECENT TRANSACTIONS */
+
+    const section =
+        document.getElementById("page-index")?.querySelector(".section");
+
+
+    if(!section)
+        return;
+
+
+    const old =
+        section.querySelectorAll(
+            ".transaction"
+        );
+
+
+    old.forEach(item => {
+        item.remove();
+    });
+
+
+    const recent =
+        [...transactions]
+        .sort(
+            (a,b) =>
+            new Date(b.date) -
+            new Date(a.date)
+        )
+        .slice(0,5);
+
+
+    recent.forEach(item => {
+
+        let icon = "💳";
+
+
+        if(item.category === "Food")
+            icon = "🍔";
+
+        if(item.category === "Transport")
+            icon = "🚌";
+
+        if(item.category === "Shopping")
+            icon = "🛍️";
+
+        if(item.category === "Education")
+            icon = "📚";
+
+        if(item.category === "Bills")
+            icon = "📄";
+
+
+        const sign =
+            item.type === "income"
+            ? "+"
+            : "-";
+
+
+        const amountClass =
+            item.type === "income"
+            ? "income"
+            : "expense";
+
+
+        section.insertAdjacentHTML(
+            "beforeend",
+
+            `
+            <div class="transaction">
+
+                <div class="transaction-left">
+
+                    <div class="transaction-icon">
+                        ${icon}
+                    </div>
+
+                    <div>
+
+                        <div class="transaction-name">
+                            ${item.name}
+                        </div>
+
+                        <div class="transaction-category">
+                            ${item.category}
+                            •
+                            ${item.date}
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="amount ${amountClass}">
+                    ${sign}
+                    ₹${Number(item.amount)
+                    .toLocaleString("en-IN")}
+                </div>
+
+            </div>
+            `
+        );
+
+    });
+
+}
+
+
+/* NAVIGATION */
+
+function go(page){
+
+    window.location.href =
+        page;
+
+}
+
+
+/* REFRESH WHEN PAGE OPENS */
+
+updateDashboard();
+
+
+/* REFRESH WHEN USER RETURNS TO DASHBOARD */
+
+window.addEventListener(
+    "pageshow",
+    updateDashboard
+);
+
+</script>
+
+
+</section>
+<section class="page-section" id="page-transactions">
+
+
+<div class="app">
+
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+<div class="logo">
+My<span>Budget</span>
+</div>
+
+<div class="menu-title">
+Finance
+</div>
+
+
+<div class="nav-item"
+onclick="go('index.html')">
+
+<div class="icon">⌂</div>
+<span>Dashboard</span>
+
+</div>
+
+
+<div class="nav-item active">
+
+<div class="icon">₹</div>
+<span>Transactions</span>
+
+</div>
+
+
+<div class="nav-item"
+onclick="go('budget.html')">
+
+<div class="icon">▣</div>
+<span>Budgets</span>
+
+</div>
+
+
+<div class="nav-item"
+onclick="go('insights.html')">
+
+<div class="icon">◔</div>
+<span>Insights</span>
+
+</div>
+
+</aside>
+
+
+<!-- MAIN -->
+
+<main class="main">
+
+
+<header class="topbar">
+
+<div class="profile">
+
+<div class="avatar">
+RK
+</div>
+
+<div>
+
+<strong>Renuga Sri</strong>
+
+<br>
+
+<small>MyBudget User</small>
+
+</div>
+
+</div>
+
+</header>
+
+
+<section class="content">
+
+
+<!-- PAGE HEADER -->
+
+<div class="page-header">
+
+<div>
+
+<h1>Transactions</h1>
+
+<p>
+View and manage your income and expenses.
+</p>
+
+</div>
+
+
+<button
+class="add-btn"
+onclick="openModal()">
+
++ Add Expense
+
+</button>
+
+</div>
+
+
+<!-- FILTERS -->
+
+<div class="filter-box">
+
+
+<input
+id="searchInput"
+type="text"
+placeholder="Search transactions..."
+oninput="filterTransactions()">
+
+
+<select
+id="categoryFilter"
+onchange="filterTransactions()">
+
+<option value="all">
+All Categories
+</option>
+
+<option value="Food">
+Food
+</option>
+
+<option value="Transport">
+Transport
+</option>
+
+<option value="Shopping">
+Shopping
+</option>
+
+<option value="Education">
+Education
+</option>
+
+<option value="Bills">
+Bills
+</option>
+
+<option value="Other">
+Other
+</option>
+
+</select>
+
+
+<select
+id="typeFilter"
+onchange="filterTransactions()">
+
+<option value="all">
+All Types
+</option>
+
+<option value="expense">
+Expenses
+</option>
+
+<option value="income">
+Income
+</option>
+
+</select>
+
+</div>
+
+
+<!-- TRANSACTION LIST -->
+
+<div class="transaction-section">
+
+<div class="section-header">
+
+<h2>
+Transaction History
+</h2>
+
+</div>
+
+
+<div id="transactionList">
+</div>
+
+</div>
+
+
+</section>
+
+</main>
+
+</div>
+
+
+<!-- ADD EXPENSE MODAL -->
+
+<div
+class="modal"
+id="modal">
+
+<div class="modal-box">
+
+
+<h2>
+Add Expense
+</h2>
+
+
+<div class="form-group">
+
+<label>
+DESCRIPTION
+</label>
+
+<input
+id="name"
+type="text"
+placeholder="Example: Lunch">
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+AMOUNT
+</label>
+
+<input
+id="amount"
+type="number"
+placeholder="₹ 0"
+min="1">
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+CATEGORY
+</label>
+
+<select id="category">
+
+<option value="Food">
+Food
+</option>
+
+<option value="Transport">
+Transport
+</option>
+
+<option value="Shopping">
+Shopping
+</option>
+
+<option value="Education">
+Education
+</option>
+
+<option value="Bills">
+Bills
+</option>
+
+<option value="Other">
+Other
+</option>
+
+</select>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+DATE
+</label>
+
+<input
+id="date"
+type="date">
+
+</div>
+
+
+<div class="buttons">
+
+<button
+class="cancel-btn"
+onclick="closeModal()">
+
+Cancel
+
+</button>
+
+
+<button
+class="save-btn"
+onclick="addExpense()">
+
+Save Expense
+
+</button>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   LOAD SHARED TRANSACTIONS
+========================= */
+
+var transactions =
+JSON.parse(
+    localStorage.getItem(
+        "myBudgetTransactions"
+    )
+) || [];
+
+
+/* =========================
+   DISPLAY TRANSACTIONS
+========================= */
+
+function displayTransactions(data){
+
+    const list =
+        document.getElementById(
+            "transactionList"
+        );
+
+    list.innerHTML = "";
+
+
+    if(data.length === 0){
+
+        list.innerHTML = `
+
+            <div class="empty">
+
+                No transactions found.
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    data.forEach(item => {
+
+        const realIndex =
+            transactions.indexOf(item);
+
+
+        let icon = "💳";
+
+
+        if(item.category === "Food")
+            icon = "🍔";
+
+        if(item.category === "Transport")
+            icon = "🚌";
+
+        if(item.category === "Shopping")
+            icon = "🛍️";
+
+        if(item.category === "Education")
+            icon = "📚";
+
+        if(item.category === "Bills")
+            icon = "📄";
+
+
+        const sign =
+            item.type === "income"
+            ? "+"
+            : "-";
+
+
+        const amountClass =
+            item.type === "income"
+            ? "income"
+            : "expense";
+
+
+        list.innerHTML += `
+
+        <div class="transaction">
+
+
+            <div class="transaction-left">
+
+
+                <div class="transaction-icon">
+
+                    ${icon}
+
+                </div>
+
+
+                <div>
+
+                    <div class="transaction-name">
+
+                        ${item.name}
+
+                    </div>
+
+
+                    <div class="transaction-info">
+
+                        ${item.category}
+                        •
+                        ${item.date}
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="amount-area">
+
+
+                <div class="amount ${amountClass}">
+
+                    ${sign}
+                    ₹${Number(item.amount)
+                    .toLocaleString("en-IN")}
+
+                </div>
+
+
+                <button
+                    class="delete-btn"
+                    onclick="deleteTransaction(${realIndex})">
+
+                    🗑️
+
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+        `;
+
+    });
+
+}
+
+
+/* =========================
+   SEARCH + FILTER
+========================= */
+
+function filterTransactions(){
+
+    const search =
+        document.getElementById(
+            "searchInput"
+        ).value
+        .toLowerCase()
+        .trim();
+
+
+    const category =
+        document.getElementById(
+            "categoryFilter"
+        ).value;
+
+
+    const type =
+        document.getElementById(
+            "typeFilter"
+        ).value;
+
+
+    const filtered =
+        transactions.filter(item => {
+
+
+            const searchMatch =
+                item.name
+                .toLowerCase()
+                .includes(search);
+
+
+            const categoryMatch =
+                category === "all" ||
+                item.category === category;
+
+
+            const typeMatch =
+                type === "all" ||
+                item.type === type;
+
+
+            return (
+                searchMatch &&
+                categoryMatch &&
+                typeMatch
+            );
+
+        });
+
+
+    displayTransactions(filtered);
+
+}
+
+
+/* =========================
+   DELETE TRANSACTION
+========================= */
+
+function deleteTransaction(index){
+
+    if(index < 0)
+        return;
+
+
+    const item =
+        transactions[index];
+
+
+    const confirmed =
+        confirm(
+            "Delete " +
+            item.name +
+            " transaction?"
+        );
+
+
+    if(!confirmed)
+        return;
+
+
+    transactions.splice(
+        index,
+        1
+    );
+
+
+    localStorage.setItem(
+        "myBudgetTransactions",
+        JSON.stringify(
+            transactions
+        )
+    );
+
+
+    filterTransactions();
+    if(typeof refreshMyBudgetUI === "function") refreshMyBudgetUI();
+
+}
+
+
+/* =========================
+   OPEN MODAL
+========================= */
+
+function openModal(){
+
+    document.getElementById(
+        "modal"
+    ).style.display = "flex";
+
+
+    document.getElementById(
+        "date"
+    ).value =
+        new Date()
+        .toISOString()
+        .split("T")[0];
+
+}
+
+
+/* =========================
+   CLOSE MODAL
+========================= */
+
+function closeModal(){
+
+    document.getElementById(
+        "modal"
+    ).style.display = "none";
+
+}
+
+
+/* =========================
+   ADD EXPENSE
+========================= */
+
+function addExpense(){
+
+    const name =
+        document.getElementById(
+            "name"
+        ).value.trim();
+
+
+    const amount =
+        Number(
+            document.getElementById(
+                "amount"
+            ).value
+        );
+
+
+    const category =
+        document.getElementById(
+            "category"
+        ).value;
+
+
+    const date =
+        document.getElementById(
+            "date"
+        ).value;
+
+
+    if(name === ""){
+
+        alert(
+            "Please enter a description."
+        );
+
+        return;
+
+    }
+
+
+    if(!amount || amount <= 0){
+
+        alert(
+            "Please enter a valid amount."
+        );
+
+        return;
+
+    }
+
+
+    if(date === ""){
+
+        alert(
+            "Please select a date."
+        );
+
+        return;
+
+    }
+
+
+    transactions.push({
+
+        name:name,
+
+        amount:amount,
+
+        category:category,
+
+        type:"expense",
+
+        date:date
+
+    });
+
+
+    localStorage.setItem(
+        "myBudgetTransactions",
+        JSON.stringify(
+            transactions
+        )
+    );
+
+
+    document.getElementById(
+        "name"
+    ).value = "";
+
+
+    document.getElementById(
+        "amount"
+    ).value = "";
+
+
+    closeModal();
+
+
+    filterTransactions();
+    if(typeof refreshMyBudgetUI === "function") refreshMyBudgetUI();
+
+}
+
+
+/* =========================
+   PAGE NAVIGATION
+========================= */
+
+function go(page){
+    const pageName = page.replace('.html', '');
+    showPage(pageName);
+}
+
+
+/* =========================
+   INITIAL LOAD
+========================= */
+
+displayTransactions(
+    transactions
+);
+
+</script>
+
+</section>
+<section class="page-section" id="page-budget">
+
+
+<div class="app">
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+<div class="logo">
+My<span>Budget</span>
+</div>
+
+<div class="menu-title">
+Finance
+</div>
+
+<div class="nav-item"
+onclick="go('index.html')">
+
+<div class="icon">⌂</div>
+<span>Dashboard</span>
+
+</div>
+
+<div class="nav-item"
+onclick="go('transactions.html')">
+
+<div class="icon">₹</div>
+<span>Transactions</span>
+
+</div>
+
+<div class="nav-item active">
+
+<div class="icon">▣</div>
+<span>Budgets</span>
+
+</div>
+
+<div class="nav-item"
+onclick="go('insights.html')">
+
+<div class="icon">◔</div>
+<span>Insights</span>
+
+</div>
+
+</aside>
+
+
+<!-- MAIN -->
+
+<main class="main">
+
+<header class="topbar">
+
+<div class="profile">
+
+<div class="avatar">
+RK
+</div>
+
+<div>
+
+<strong>Renuga Sri</strong>
+
+<br>
+
+The content is very long; truncated here for analysis but full content sent to tool. (continued)
