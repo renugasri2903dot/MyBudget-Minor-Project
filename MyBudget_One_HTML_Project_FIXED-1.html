@@ -1,0 +1,4909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyBudget - Complete Project</title>
+<style>
+.page-section { display:none; }
+.transaction{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 0;
+    border-bottom:1px solid #eee;
+}
+
+.transaction:last-child{
+    border-bottom:none;
+}
+
+.transaction-left{
+    /* layout for left side of a transaction; defined later as well */
+}
+
+.add-btn{
+    background:#16a34a;
+    color:white;
+    border:none;
+    padding:11px 17px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.add-btn:hover{
+    background:#15803d;
+}
+
+/* FILTERS */
+
+.filter-box{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:18px;
+    margin-bottom:20px;
+    display:grid;
+    grid-template-columns:2fr 1fr 1fr;
+    gap:12px;
+}
+
+.filter-box input,
+.filter-box select{
+    width:100%;
+    padding:11px;
+    border:1px solid #d1d5db;
+    border-radius:7px;
+    outline:none;
+    background:white;
+}
+
+.filter-box input:focus,
+.filter-box select:focus{
+    border-color:#16a34a;
+}
+
+/* TRANSACTIONS */
+
+.transaction-section{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    overflow:hidden;
+}
+
+.section-header{
+    padding:20px;
+    border-bottom:1px solid #eeeeee;
+}
+
+.section-header h2{
+    font-size:18px;
+}
+
+.transaction{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:17px 20px;
+    border-bottom:1px solid #eeeeee;
+}
+
+.transaction:last-child{
+    border-bottom:none;
+}
+
+.transaction-left{
+    display:flex;
+    align-items:center;
+    gap:13px;
+}
+
+.transaction-icon{
+    width:42px;
+    height:42px;
+    border-radius:10px;
+    background:#f0fdf4;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+}
+
+.transaction-name{
+    font-weight:bold;
+    margin-bottom:5px;
+}
+
+.transaction-info{
+    color:#6b7280;
+    font-size:12px;
+}
+
+.amount{
+    font-weight:bold;
+}
+
+.income{
+    color:#16a34a;
+}
+
+.expense{
+    color:#dc2626;
+}
+
+.delete-btn{
+    border:none;
+    background:#fee2e2;
+    color:#dc2626;
+    padding:7px 9px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.delete-btn:hover{
+    background:#fecaca;
+}
+
+.amount-area{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+/* MODAL */
+
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    justify-content:center;
+    align-items:center;
+    z-index:100;
+}
+
+.modal-box{
+    width:420px;
+    max-width:90%;
+    background:white;
+    border-radius:12px;
+    padding:25px;
+}
+
+.modal-box h2{
+    margin-bottom:20px;
+}
+
+.form-group{
+    margin-bottom:16px;
+}
+
+.form-group label{
+    display:block;
+    font-size:12px;
+    font-weight:bold;
+    margin-bottom:7px;
+}
+
+.form-group input,
+.form-group select{
+    width:100%;
+    padding:11px;
+    border:1px solid #d1d5db;
+    border-radius:7px;
+    outline:none;
+}
+
+.form-group input:focus,
+.form-group select:focus{
+    border-color:#16a34a;
+}
+
+.buttons{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:20px;
+}
+
+.cancel-btn{
+    border:none;
+    background:#e5e7eb;
+    padding:10px 16px;
+    border-radius:7px;
+    cursor:pointer;
+}
+
+.save-btn{
+    border:none;
+    background:#16a34a;
+    color:white;
+    padding:10px 16px;
+    border-radius:7px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.empty{
+    padding:35px;
+    text-align:center;
+    color:#6b7280;
+}
+
+/* MOBILE */
+
+@media(max-width:800px){
+
+    .sidebar{
+        width:70px;
+        padding:20px 8px;
+    }
+
+    .logo{
+        font-size:0;
+    }
+
+    .logo span{
+        font-size:20px;
+    }
+
+    .nav-item{
+        justify-content:center;
+    }
+
+    .nav-item span:not(.icon),
+    .menu-title{
+        display:none;
+    }
+
+    .main{
+        margin-left:70px;
+        width:calc(100% - 70px);
+    }
+
+    .page-header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:15px;
+    }
+
+    .filter-box{
+        grid-template-columns:1fr;
+    }
+
+    .transaction{
+        gap:10px;
+    }
+
+    .amount-area{
+        gap:7px;
+    }
+
+}
+
+
+
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f5f7fb;
+    color:#1f2937;
+}
+
+.app{
+    display:flex;
+    min-height:100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:230px;
+    height:100vh;
+    position:fixed;
+    background:#111827;
+    color:white;
+    padding:25px 18px;
+}
+
+.logo{
+    font-size:25px;
+    font-weight:bold;
+    margin-bottom:40px;
+    padding-left:10px;
+}
+
+.logo span{
+    color:#22c55e;
+}
+
+.menu-title{
+    font-size:11px;
+    color:#9ca3af;
+    margin:20px 10px 10px;
+    text-transform:uppercase;
+}
+
+.nav-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px;
+    margin:5px 0;
+    border-radius:8px;
+    color:#d1d5db;
+    cursor:pointer;
+}
+
+.nav-item:hover,
+.nav-item.active{
+    background:#16a34a;
+    color:white;
+}
+
+.icon{
+    width:22px;
+    text-align:center;
+}
+
+/* MAIN */
+
+.main{
+    margin-left:230px;
+    width:calc(100% - 230px);
+}
+
+.topbar{
+    height:70px;
+    background:white;
+    border-bottom:1px solid #e5e7eb;
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    padding:0 30px;
+}
+
+.profile{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.avatar{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:#16a34a;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+}
+
+/* CONTENT */
+
+.content{
+    padding:30px;
+}
+
+.page-header{
+    margin-bottom:25px;
+}
+
+.page-header h1{
+    font-size:28px;
+    margin-bottom:6px;
+}
+
+.page-header p{
+    color:#6b7280;
+}
+
+/* BUDGET SUMMARY */
+
+.summary{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
+    margin-bottom:25px;
+}
+
+.card{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:20px;
+}
+
+.card-title{
+    color:#6b7280;
+    font-size:13px;
+    margin-bottom:10px;
+}
+
+.card-value{
+    font-size:24px;
+    font-weight:bold;
+}
+
+.green{
+    color:#16a34a;
+}
+
+/* BUDGET SECTION */
+
+.budget-section{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:20px;
+}
+
+.section-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.section-header h2{
+    font-size:18px;
+}
+
+.set-btn{
+    background:#16a34a;
+    color:white;
+    border:none;
+    padding:10px 15px;
+    border-radius:7px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+/* BUDGET ITEM */
+
+.budget-item{
+    padding:18px 0;
+    border-bottom:1px solid #eeeeee;
+}
+
+.budget-item:last-child{
+    border-bottom:none;
+}
+
+.budget-top{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:9px;
+}
+
+.category{
+    font-weight:bold;
+}
+
+.amount-text{
+    font-size:13px;
+    color:#6b7280;
+}
+
+.progress{
+    width:100%;
+    height:9px;
+    background:#e5e7eb;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.progress-bar{
+    height:100%;
+    background:#16a34a;
+    border-radius:10px;
+}
+
+.warning{
+    background:#f59e0b;
+}
+
+.danger{
+    background:#dc2626;
+}
+
+.remaining{
+    margin-top:7px;
+    color:#6b7280;
+    font-size:12px;
+}
+
+/* MODAL */
+
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    justify-content:center;
+    align-items:center;
+}
+
+.modal-box{
+    width:400px;
+    max-width:90%;
+    background:white;
+    border-radius:12px;
+    padding:25px;
+}
+
+.modal-box h2{
+    margin-bottom:20px;
+}
+
+.form-group{
+    margin-bottom:15px;
+}
+
+.form-group label{
+    display:block;
+    font-size:12px;
+    font-weight:bold;
+    margin-bottom:7px;
+}
+
+.form-group input,
+.form-group select{
+    width:100%;
+    padding:10px;
+    border:1px solid #d1d5db;
+    border-radius:7px;
+    outline:none;
+}
+
+.buttons{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:20px;
+}
+
+.cancel{
+    border:none;
+    background:#e5e7eb;
+    padding:10px 15px;
+    border-radius:7px;
+    cursor:pointer;
+}
+
+.save{
+    border:none;
+    background:#16a34a;
+    color:white;
+    padding:10px 15px;
+    border-radius:7px;
+    cursor:pointer;
+}
+
+/* MOBILE */
+
+@media(max-width:800px){
+
+    .sidebar{
+        width:70px;
+        padding:20px 8px;
+    }
+
+    .logo{
+        font-size:0;
+    }
+
+    .logo span{
+        font-size:20px;
+    }
+
+    .nav-item{
+        justify-content:center;
+    }
+
+    .nav-item span:not(.icon),
+    .menu-title{
+        display:none;
+    }
+
+    .main{
+        margin-left:70px;
+        width:calc(100% - 70px);
+    }
+
+    .summary{
+        grid-template-columns:1fr;
+    }
+
+}
+
+
+
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f5f7fb;
+    color:#1f2937;
+}
+
+.app{
+    display:flex;
+    min-height:100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:230px;
+    height:100vh;
+    position:fixed;
+    background:#111827;
+    color:white;
+    padding:25px 18px;
+}
+
+.logo{
+    font-size:25px;
+    font-weight:bold;
+    margin-bottom:40px;
+    padding-left:10px;
+}
+
+.logo span{
+    color:#22c55e;
+}
+
+.menu-title{
+    font-size:11px;
+    color:#9ca3af;
+    margin:20px 10px 10px;
+    text-transform:uppercase;
+}
+
+.nav-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px;
+    margin:5px 0;
+    border-radius:8px;
+    color:#d1d5db;
+    cursor:pointer;
+}
+
+.nav-item:hover,
+.nav-item.active{
+    background:#16a34a;
+    color:white;
+}
+
+.icon{
+    width:22px;
+    text-align:center;
+}
+
+/* MAIN */
+
+.main{
+    margin-left:230px;
+    width:calc(100% - 230px);
+}
+
+.topbar{
+    height:70px;
+    background:white;
+    border-bottom:1px solid #e5e7eb;
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    padding:0 30px;
+}
+
+.profile{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.avatar{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:#16a34a;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+}
+
+/* CONTENT */
+
+.content{
+    padding:30px;
+}
+
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.page-header h1{
+    font-size:28px;
+    margin-bottom:6px;
+}
+
+.page-header p{
+    color:#6b7280;
+}
+
+.month-select{
+    padding:10px 13px;
+    border:1px solid #d1d5db;
+    border-radius:7px;
+    background:white;
+}
+
+/* SUMMARY */
+
+.summary{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+    margin-bottom:25px;
+}
+
+.card{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:20px;
+}
+
+.card-title{
+    color:#6b7280;
+    font-size:13px;
+    margin-bottom:10px;
+}
+
+.card-value{
+    font-size:24px;
+    font-weight:bold;
+}
+
+.green{
+    color:#16a34a;
+}
+
+.red{
+    color:#dc2626;
+}
+
+/* CONTENT GRID */
+
+.insights-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+/* CARD SECTION */
+
+.section{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:20px;
+}
+
+.section h2{
+    font-size:18px;
+    margin-bottom:20px;
+}
+
+/* CATEGORY */
+
+.category-row{
+    margin-bottom:18px;
+}
+
+.category-top{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:7px;
+    font-size:13px;
+}
+
+.category-name{
+    font-weight:bold;
+}
+
+.category-amount{
+    color:#6b7280;
+}
+
+.progress{
+    width:100%;
+    height:8px;
+    background:#e5e7eb;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.progress-bar{
+    height:100%;
+    background:#16a34a;
+    border-radius:10px;
+}
+
+/* MONTHLY REPORT */
+
+.report-row{
+    display:flex;
+    justify-content:space-between;
+    padding:15px 0;
+    border-bottom:1px solid #eeeeee;
+}
+
+.report-row:last-child{
+    border-bottom:none;
+}
+
+.report-label{
+    color:#6b7280;
+    font-size:13px;
+}
+
+.report-value{
+    font-weight:bold;
+}
+
+/* SIMPLE INSIGHT */
+
+.insight-box{
+    margin-top:20px;
+    padding:15px;
+    background:#f0fdf4;
+    border-radius:8px;
+    color:#166534;
+    font-size:13px;
+    line-height:1.5;
+}
+
+/* MOBILE */
+
+@media(max-width:800px){
+
+    .sidebar{
+        width:70px;
+        padding:20px 8px;
+    }
+
+    .logo{
+        font-size:0;
+    }
+
+    .logo span{
+        font-size:20px;
+    }
+
+    .nav-item{
+        justify-content:center;
+    }
+
+    .nav-item span:not(.icon),
+    .menu-title{
+        display:none;
+    }
+
+    .main{
+        margin-left:70px;
+        width:calc(100% - 70px);
+    }
+
+    .page-header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:15px;
+    }
+
+    .summary{
+        grid-template-columns:1fr;
+    }
+
+    .insights-grid{
+        grid-template-columns:1fr;
+    }
+
+}
+
+
+</style>
+</head>
+<body>
+<section class="page-section" id="page-index">
+
+
+<div class="app">
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+<div class="logo">
+My<span>Budget</span>
+</div>
+
+<div class="menu-title">
+Finance
+</div>
+
+<div class="nav-item active">
+<div class="icon">⌂</div>
+<span>Dashboard</span>
+</div>
+
+<div class="nav-item" onclick="go('transactions.html')">
+<div class="icon">₹</div>
+<span>Transactions</span>
+</div>
+
+<div class="nav-item" onclick="go('budget.html')">
+<div class="icon">▣</div>
+<span>Budgets</span>
+</div>
+
+<div class="nav-item" onclick="go('insights.html')">
+<div class="icon">◔</div>
+<span>Insights</span>
+</div>
+
+</aside>
+
+
+<!-- MAIN -->
+
+<main class="main">
+
+<header class="topbar">
+
+<input
+class="search"
+type="text"
+placeholder="Search..."
+>
+
+<div class="profile">
+
+<div class="avatar">
+RK
+</div>
+
+<div>
+<strong>Renuga Sri</strong>
+<br>
+<small>MyBudget User</small>
+</div>
+
+</div>
+
+</header>
+
+
+<section class="content">
+
+<!-- WELCOME -->
+
+<div class="welcome">
+
+<h1>Good Morning, Renuga Sri 👋</h1>
+
+<p>
+Here is your financial overview for this month.
+</p>
+
+</div>
+
+
+<!-- SUMMARY -->
+
+<div class="summary">
+
+<div class="card">
+
+<div class="card-title">
+Total Balance
+</div>
+
+<div class="card-value">
+₹46,200
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="card-title">
+Income
+</div>
+
+<div class="card-value green">
+₹50,000
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="card-title">
+Expenses
+</div>
+
+<div class="card-value red">
+₹3,800
+</div>
+
+</div>
+
+</div>
+
+
+<!-- QUICK ACTIONS -->
+
+<div class="quick-actions">
+
+<button
+class="action-btn expense-btn"
+onclick="go('transactions.html')">
+
++ Add Expense
+
+</button>
+
+<button
+class="action-btn budget-btn"
+onclick="go('budget.html')">
+
+Set Budget
+
+</button>
+
+</div>
+
+
+<!-- RECENT TRANSACTIONS -->
+
+<div class="section">
+
+<div class="section-header">
+
+<h2>
+Recent Transactions
+</h2>
+
+<button
+class="view-btn"
+onclick="go('transactions.html')">
+
+View All
+
+</button>
+
+</div>
+
+
+<div class="transaction">
+
+<div class="transaction-left">
+
+<div class="transaction-icon">
+🍔
+</div>
+
+<div>
+
+<div class="transaction-name">
+Food
+</div>
+
+<div class="transaction-category">
+Today
+</div>
+
+</div>
+
+</div>
+
+<div class="amount expense">
+- ₹250
+</div>
+
+</div>
+
+
+<div class="transaction">
+
+<div class="transaction-left">
+
+<div class="transaction-icon">
+🚌
+</div>
+
+<div>
+
+<div class="transaction-name">
+Transport
+</div>
+
+<div class="transaction-category">
+Yesterday
+</div>
+
+</div>
+
+</div>
+
+<div class="amount expense">
+- ₹120
+</div>
+
+</div>
+
+
+<div class="transaction">
+
+<div class="transaction-left">
+
+<div class="transaction-icon">
+💰
+</div>
+
+<div>
+
+<div class="transaction-name">
+Salary
+</div>
+
+<div class="transaction-category">
+01 Aug 2026
+</div>
+
+</div>
+
+</div>
+
+<div class="amount income">
++ ₹50,000
+</div>
+
+</div>
+
+
+<div class="transaction">
+
+<div class="transaction-left">
+
+<div class="transaction-icon">
+📚
+</div>
+
+<div>
+
+<div class="transaction-name">
+Education
+</div>
+
+<div class="transaction-category">
+05 Aug 2026
+</div>
+
+</div>
+
+</div>
+
+<div class="amount expense">
+- ₹1,200
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+
+<script>
+
+/* LOAD SHARED DATA */
+
+function getTransactions(){
+
+    return JSON.parse(
+        localStorage.getItem(
+            "myBudgetTransactions"
+        )
+    ) || [];
+
+}
+
+
+/* UPDATE DASHBOARD */
+
+function updateDashboard(){
+
+    const transactions =
+        getTransactions();
+
+
+    let income = 0;
+    let expenses = 0;
+
+
+    transactions.forEach(item => {
+
+        const amount =
+            Number(item.amount) || 0;
+
+
+        if(item.type === "income"){
+
+            income += amount;
+
+        }else{
+
+            expenses += amount;
+
+        }
+
+    });
+
+
+    const balance =
+        income - expenses;
+
+
+    /* SUMMARY CARDS */
+
+    const cards =
+        document.getElementById("page-index")?.querySelectorAll(".card-value") || [];
+
+
+    if(cards.length >= 3){
+
+        cards[0].innerText =
+            "₹" +
+            balance.toLocaleString("en-IN");
+
+        cards[1].innerText =
+            "₹" +
+            income.toLocaleString("en-IN");
+
+        cards[2].innerText =
+            "₹" +
+            expenses.toLocaleString("en-IN");
+
+    }
+
+
+    /* RECENT TRANSACTIONS */
+
+    const section =
+        document.getElementById("page-index")?.querySelector(".section");
+
+
+    if(!section)
+        return;
+
+
+    const old =
+        section.querySelectorAll(
+            ".transaction"
+        );
+
+
+    old.forEach(item => {
+        item.remove();
+    });
+
+
+    const recent =
+        [...transactions]
+        .sort(
+            (a,b) =>
+            new Date(b.date) -
+            new Date(a.date)
+        )
+        .slice(0,5);
+
+
+    recent.forEach(item => {
+
+        let icon = "💳";
+
+
+        if(item.category === "Food")
+            icon = "🍔";
+
+        if(item.category === "Transport")
+            icon = "🚌";
+
+        if(item.category === "Shopping")
+            icon = "🛍️";
+
+        if(item.category === "Education")
+            icon = "📚";
+
+        if(item.category === "Bills")
+            icon = "📄";
+
+
+        const sign =
+            item.type === "income"
+            ? "+"
+            : "-";
+
+
+        const amountClass =
+            item.type === "income"
+            ? "income"
+            : "expense";
+
+
+        section.insertAdjacentHTML(
+            "beforeend",
+
+            `
+            <div class="transaction">
+
+                <div class="transaction-left">
+
+                    <div class="transaction-icon">
+                        ${icon}
+                    </div>
+
+                    <div>
+
+                        <div class="transaction-name">
+                            ${item.name}
+                        </div>
+
+                        <div class="transaction-category">
+                            ${item.category}
+                            •
+                            ${item.date}
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="amount ${amountClass}">
+                    ${sign}
+                    ₹${Number(item.amount)
+                    .toLocaleString("en-IN")}
+                </div>
+
+            </div>
+            `
+        );
+
+    });
+
+}
+
+
+/* NAVIGATION */
+
+function go(page){
+
+    window.location.href =
+        page;
+
+}
+
+
+/* REFRESH WHEN PAGE OPENS */
+
+updateDashboard();
+
+
+/* REFRESH WHEN USER RETURNS TO DASHBOARD */
+
+window.addEventListener(
+    "pageshow",
+    updateDashboard
+);
+
+</script>
+
+
+</section>
+<section class="page-section" id="page-transactions">
+
+
+<div class="app">
+
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+<div class="logo">
+My<span>Budget</span>
+</div>
+
+<div class="menu-title">
+Finance
+</div>
+
+
+<div class="nav-item"
+onclick="go('index.html')">
+
+<div class="icon">⌂</div>
+<span>Dashboard</span>
+
+</div>
+
+
+<div class="nav-item active">
+
+<div class="icon">₹</div>
+<span>Transactions</span>
+
+</div>
+
+
+<div class="nav-item"
+onclick="go('budget.html')">
+
+<div class="icon">▣</div>
+<span>Budgets</span>
+
+</div>
+
+
+<div class="nav-item"
+onclick="go('insights.html')">
+
+<div class="icon">◔</div>
+<span>Insights</span>
+
+</div>
+
+</aside>
+
+
+<!-- MAIN -->
+
+<main class="main">
+
+
+<header class="topbar">
+
+<div class="profile">
+
+<div class="avatar">
+RK
+</div>
+
+<div>
+
+<strong>Renuga Sri</strong>
+
+<br>
+
+<small>MyBudget User</small>
+
+</div>
+
+</div>
+
+</header>
+
+
+<section class="content">
+
+
+<!-- PAGE HEADER -->
+
+<div class="page-header">
+
+<div>
+
+<h1>Transactions</h1>
+
+<p>
+View and manage your income and expenses.
+</p>
+
+</div>
+
+
+<button
+class="add-btn"
+onclick="openModal()">
+
++ Add Expense
+
+</button>
+
+</div>
+
+
+<!-- FILTERS -->
+
+<div class="filter-box">
+
+
+<input
+id="searchInput"
+type="text"
+placeholder="Search transactions..."
+oninput="filterTransactions()">
+
+
+<select
+id="categoryFilter"
+onchange="filterTransactions()">
+
+<option value="all">
+All Categories
+</option>
+
+<option value="Food">
+Food
+</option>
+
+<option value="Transport">
+Transport
+</option>
+
+<option value="Shopping">
+Shopping
+</option>
+
+<option value="Education">
+Education
+</option>
+
+<option value="Bills">
+Bills
+</option>
+
+<option value="Other">
+Other
+</option>
+
+</select>
+
+
+<select
+id="typeFilter"
+onchange="filterTransactions()">
+
+<option value="all">
+All Types
+</option>
+
+<option value="expense">
+Expenses
+</option>
+
+<option value="income">
+Income
+</option>
+
+</select>
+
+</div>
+
+
+<!-- TRANSACTION LIST -->
+
+<div class="transaction-section">
+
+<div class="section-header">
+
+<h2>
+Transaction History
+</h2>
+
+</div>
+
+
+<div id="transactionList">
+</div>
+
+</div>
+
+
+</section>
+
+</main>
+
+</div>
+
+
+<!-- ADD EXPENSE MODAL -->
+
+<div
+class="modal"
+id="modal">
+
+<div class="modal-box">
+
+
+<h2>
+Add Expense
+</h2>
+
+
+<div class="form-group">
+
+<label>
+DESCRIPTION
+</label>
+
+<input
+id="name"
+type="text"
+placeholder="Example: Lunch">
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+AMOUNT
+</label>
+
+<input
+id="amount"
+type="number"
+placeholder="₹ 0"
+min="1">
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+CATEGORY
+</label>
+
+<select id="category">
+
+<option value="Food">
+Food
+</option>
+
+<option value="Transport">
+Transport
+</option>
+
+<option value="Shopping">
+Shopping
+</option>
+
+<option value="Education">
+Education
+</option>
+
+<option value="Bills">
+Bills
+</option>
+
+<option value="Other">
+Other
+</option>
+
+</select>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+DATE
+</label>
+
+<input
+id="date"
+type="date">
+
+</div>
+
+
+<div class="buttons">
+
+<button
+class="cancel-btn"
+onclick="closeModal()">
+
+Cancel
+
+</button>
+
+
+<button
+class="save-btn"
+onclick="addExpense()">
+
+Save Expense
+
+</button>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   LOAD SHARED TRANSACTIONS
+========================= */
+
+var transactions =
+JSON.parse(
+    localStorage.getItem(
+        "myBudgetTransactions"
+    )
+) || [];
+
+
+/* =========================
+   DISPLAY TRANSACTIONS
+========================= */
+
+function displayTransactions(data){
+
+    const list =
+        document.getElementById(
+            "transactionList"
+        );
+
+    list.innerHTML = "";
+
+
+    if(data.length === 0){
+
+        list.innerHTML = `
+
+            <div class="empty">
+
+                No transactions found.
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    data.forEach(item => {
+
+        const realIndex =
+            transactions.indexOf(item);
+
+
+        let icon = "💳";
+
+
+        if(item.category === "Food")
+            icon = "🍔";
+
+        if(item.category === "Transport")
+            icon = "🚌";
+
+        if(item.category === "Shopping")
+            icon = "🛍️";
+
+        if(item.category === "Education")
+            icon = "📚";
+
+        if(item.category === "Bills")
+            icon = "📄";
+
+
+        const sign =
+            item.type === "income"
+            ? "+"
+            : "-";
+
+
+        const amountClass =
+            item.type === "income"
+            ? "income"
+            : "expense";
+
+
+        list.innerHTML += `
+
+        <div class="transaction">
+
+
+            <div class="transaction-left">
+
+
+                <div class="transaction-icon">
+
+                    ${icon}
+
+                </div>
+
+
+                <div>
+
+                    <div class="transaction-name">
+
+                        ${item.name}
+
+                    </div>
+
+
+                    <div class="transaction-info">
+
+                        ${item.category}
+                        •
+                        ${item.date}
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="amount-area">
+
+
+                <div class="amount ${amountClass}">
+
+                    ${sign}
+                    ₹${Number(item.amount)
+                    .toLocaleString("en-IN")}
+
+                </div>
+
+
+                <button
+                    class="delete-btn"
+                    onclick="deleteTransaction(${realIndex})">
+
+                    🗑️
+
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+        `;
+
+    });
+
+}
+
+
+/* =========================
+   SEARCH + FILTER
+========================= */
+
+function filterTransactions(){
+
+    const search =
+        document.getElementById(
+            "searchInput"
+        ).value
+        .toLowerCase()
+        .trim();
+
+
+    const category =
+        document.getElementById(
+            "categoryFilter"
+        ).value;
+
+
+    const type =
+        document.getElementById(
+            "typeFilter"
+        ).value;
+
+
+    const filtered =
+        transactions.filter(item => {
+
+
+            const searchMatch =
+                item.name
+                .toLowerCase()
+                .includes(search);
+
+
+            const categoryMatch =
+                category === "all" ||
+                item.category === category;
+
+
+            const typeMatch =
+                type === "all" ||
+                item.type === type;
+
+
+            return (
+                searchMatch &&
+                categoryMatch &&
+                typeMatch
+            );
+
+        });
+
+
+    displayTransactions(filtered);
+
+}
+
+
+/* =========================
+   DELETE TRANSACTION
+========================= */
+
+function deleteTransaction(index){
+
+    if(index < 0)
+        return;
+
+
+    const item =
+        transactions[index];
+
+
+    const confirmed =
+        confirm(
+            "Delete " +
+            item.name +
+            " transaction?"
+        );
+
+
+    if(!confirmed)
+        return;
+
+
+    transactions.splice(
+        index,
+        1
+    );
+
+
+    localStorage.setItem(
+        "myBudgetTransactions",
+        JSON.stringify(
+            transactions
+        )
+    );
+
+
+    filterTransactions();
+    if(typeof refreshMyBudgetUI === "function") refreshMyBudgetUI();
+
+}
+
+
+/* =========================
+   OPEN MODAL
+========================= */
+
+function openModal(){
+
+    document.getElementById(
+        "modal"
+    ).style.display = "flex";
+
+
+    document.getElementById(
+        "date"
+    ).value =
+        new Date()
+        .toISOString()
+        .split("T")[0];
+
+}
+
+
+/* =========================
+   CLOSE MODAL
+========================= */
+
+function closeModal(){
+
+    document.getElementById(
+        "modal"
+    ).style.display = "none";
+
+}
+
+
+/* =========================
+   ADD EXPENSE
+========================= */
+
+function addExpense(){
+
+    const name =
+        document.getElementById(
+            "name"
+        ).value.trim();
+
+
+    const amount =
+        Number(
+            document.getElementById(
+                "amount"
+            ).value
+        );
+
+
+    const category =
+        document.getElementById(
+            "category"
+        ).value;
+
+
+    const date =
+        document.getElementById(
+            "date"
+        ).value;
+
+
+    if(name === ""){
+
+        alert(
+            "Please enter a description."
+        );
+
+        return;
+
+    }
+
+
+    if(!amount || amount <= 0){
+
+        alert(
+            "Please enter a valid amount."
+        );
+
+        return;
+
+    }
+
+
+    if(date === ""){
+
+        alert(
+            "Please select a date."
+        );
+
+        return;
+
+    }
+
+
+    transactions.push({
+
+        name:name,
+
+        amount:amount,
+
+        category:category,
+
+        type:"expense",
+
+        date:date
+
+    });
+
+
+    localStorage.setItem(
+        "myBudgetTransactions",
+        JSON.stringify(
+            transactions
+        )
+    );
+
+
+    document.getElementById(
+        "name"
+    ).value = "";
+
+
+    document.getElementById(
+        "amount"
+    ).value = "";
+
+
+    closeModal();
+
+
+    filterTransactions();
+    if(typeof refreshMyBudgetUI === "function") refreshMyBudgetUI();
+
+}
+
+
+/* =========================
+   PAGE NAVIGATION
+========================= */
+
+function go(page){
+    const pageName = page.replace('.html', '');
+    showPage(pageName);
+}
+
+
+/* =========================
+   INITIAL LOAD
+========================= */
+
+displayTransactions(
+    transactions
+);
+
+</script>
+
+
+</section>
+<section class="page-section" id="page-budget">
+
+
+<div class="app">
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+<div class="logo">
+My<span>Budget</span>
+</div>
+
+<div class="menu-title">
+Finance
+</div>
+
+<div class="nav-item"
+onclick="go('index.html')">
+
+<div class="icon">⌂</div>
+<span>Dashboard</span>
+
+</div>
+
+<div class="nav-item"
+onclick="go('transactions.html')">
+
+<div class="icon">₹</div>
+<span>Transactions</span>
+
+</div>
+
+<div class="nav-item active">
+
+<div class="icon">▣</div>
+<span>Budgets</span>
+
+</div>
+
+<div class="nav-item"
+onclick="go('insights.html')">
+
+<div class="icon">◔</div>
+<span>Insights</span>
+
+</div>
+
+</aside>
+
+
+<!-- MAIN -->
+
+<main class="main">
+
+<header class="topbar">
+
+<div class="profile">
+
+<div class="avatar">
+RK
+</div>
+
+<div>
+
+<strong>Renuga Sri</strong>
+
+<br>
+
+<small>MyBudget User</small>
+
+</div>
+
+</div>
+
+</header>
+
+
+<section class="content">
+
+<div class="page-header">
+
+<h1>Budgets</h1>
+
+<p>
+Set and manage your monthly spending limits.
+</p>
+
+</div>
+
+
+<!-- SUMMARY -->
+
+<div class="summary">
+
+<div class="card">
+
+<div class="card-title">
+Monthly Budget
+</div>
+
+<div class="card-value">
+₹20,000
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="card-title">
+Remaining Budget
+</div>
+
+<div class="card-value green"
+id="remainingTotal">
+
+₹12,500
+</div>
+
+</div>
+
+</div>
+
+
+<!-- BUDGETS -->
+
+<div class="budget-section">
+
+<div class="section-header">
+
+<h2>
+Budget Settings
+</h2>
+
+<button
+class="set-btn"
+onclick="openBudgetModal()">
+
++ Set Budget
+
+</button>
+
+</div>
+
+
+<div id="budgetList"></div>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+
+<!-- MODAL -->
+
+<div
+class="modal"
+id="budgetModal">
+
+<div class="modal-box">
+
+<h2>
+Set Budget
+</h2>
+
+
+<div class="form-group">
+
+<label>
+CATEGORY
+</label>
+
+<select id="budgetCategory">
+
+<option>Food</option>
+<option>Transport</option>
+<option>Shopping</option>
+<option>Education</option>
+<option>Bills</option>
+
+</select>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+MONTHLY LIMIT
+</label>
+
+<input
+id="budgetAmount"
+type="number"
+placeholder="₹ 0">
+
+</div>
+
+
+<div class="buttons">
+
+<button
+class="cancel"
+onclick="closeBudgetModal()">
+
+Cancel
+
+</button>
+
+<button
+class="save"
+onclick="saveBudget()">
+
+Save
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* SHARED DATA */
+
+var transactions =
+JSON.parse(
+    localStorage.getItem("myBudgetTransactions")
+) || [];
+
+var budgets =
+JSON.parse(
+    localStorage.getItem("myBudgetBudgets")
+) || [
+
+    {
+        category:"Food",
+        limit:5000
+    },
+
+    {
+        category:"Transport",
+        limit:3000
+    },
+
+    {
+        category:"Shopping",
+        limit:4000
+    },
+
+    {
+        category:"Education",
+        limit:3000
+    },
+
+    {
+        category:"Bills",
+        limit:5000
+    }
+
+];
+
+
+/* CALCULATE SPENDING */
+
+function getSpent(category){
+
+    return transactions
+        .filter(item =>
+            item.type === "expense" &&
+            item.category === category
+        )
+        .reduce(
+            (total,item) =>
+            total + Number(item.amount),
+            0
+        );
+
+}
+
+
+/* DISPLAY BUDGETS */
+
+function displayBudgets(){
+
+    const list =
+        document.getElementById("budgetList");
+
+    list.innerHTML = "";
+
+    let totalLimit = 0;
+    let totalSpent = 0;
+
+
+    budgets.forEach(item => {
+
+        const spent =
+            getSpent(item.category);
+
+        const limit =
+            Number(item.limit);
+
+        totalLimit += limit;
+        totalSpent += spent;
+
+
+        let percentage =
+            limit > 0
+            ? (spent / limit) * 100
+            : 0;
+
+
+        const displayPercentage =
+            Math.min(percentage,100);
+
+
+        let barClass = "";
+
+        if(
+            percentage >= 80 &&
+            percentage < 100
+        ){
+            barClass = "warning";
+        }
+
+        if(percentage >= 100){
+            barClass = "danger";
+        }
+
+
+        const remaining =
+            limit - spent;
+
+
+        list.innerHTML += `
+
+        <div class="budget-item">
+
+            <div class="budget-top">
+
+                <div class="category">
+                    ${item.category}
+                </div>
+
+                <div class="amount-text">
+                    ₹${spent.toLocaleString("en-IN")}
+                    /
+                    ₹${limit.toLocaleString("en-IN")}
+                </div>
+
+            </div>
+
+
+            <div class="progress">
+
+                <div
+                    class="progress-bar ${barClass}"
+                    style="width:${displayPercentage}%">
+                </div>
+
+            </div>
+
+
+            <div class="remaining">
+
+                ${
+                    remaining >= 0
+
+                    ? "₹" +
+                      remaining.toLocaleString("en-IN") +
+                      " remaining"
+
+                    : "Budget exceeded by ₹" +
+                      Math.abs(remaining)
+                      .toLocaleString("en-IN")
+                }
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+
+    const remainingTotal =
+        Math.max(
+            totalLimit - totalSpent,
+            0
+        );
+
+
+    document.getElementById(
+        "remainingTotal"
+    ).innerText =
+        "₹" +
+        remainingTotal.toLocaleString("en-IN");
+
+}
+window.addEventListener(
+    "pageshow",
+    function(){
+
+        transactions =
+            JSON.parse(
+                localStorage.getItem(
+                    "myBudgetTransactions"
+                )
+            ) || [];
+
+        budgets =
+            JSON.parse(
+                localStorage.getItem(
+                    "myBudgetBudgets"
+                )
+            ) || [];
+
+        displayBudgets();
+
+    }
+);
+
+
+/* OPEN MODAL */
+
+function openBudgetModal(){
+
+    document.getElementById(
+        "budgetModal"
+    ).style.display = "flex";
+
+}
+
+
+/* CLOSE MODAL */
+
+function closeBudgetModal(){
+
+    document.getElementById(
+        "budgetModal"
+    ).style.display = "none";
+
+}
+
+
+/* SAVE / UPDATE BUDGET */
+
+function saveBudget(){
+
+    const category =
+        document.getElementById(
+            "budgetCategory"
+        ).value;
+
+
+    const amount =
+        Number(
+            document.getElementById(
+                "budgetAmount"
+            ).value
+        );
+
+
+    if(!amount || amount <= 0){
+
+        alert(
+            "Please enter a valid budget amount."
+        );
+
+        return;
+
+    }
+
+
+    const existing =
+        budgets.find(
+            item =>
+            item.category === category
+        );
+
+
+    if(existing){
+
+        existing.limit = amount;
+
+    }else{
+
+        budgets.push({
+
+            category: category,
+
+            limit: amount
+
+        });
+
+    }
+
+
+    /* SAVE BUDGET */
+
+    localStorage.setItem(
+        "myBudgetBudgets",
+        JSON.stringify(budgets)
+    );
+
+
+    displayBudgets();
+
+
+    document.getElementById(
+        "budgetAmount"
+    ).value = "";
+
+
+    closeBudgetModal();
+
+}
+
+
+/* NAVIGATION */
+
+function go(page){
+    const pageName = page.replace('.html', '');
+    showPage(pageName);
+}
+
+
+/* INITIAL LOAD */
+
+displayBudgets();
+
+</script>
+
+
+</section>
+<section class="page-section" id="page-insights">
+
+
+<div class="app">
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+<div class="logo">
+My<span>Budget</span>
+</div>
+
+<div class="menu-title">
+Finance
+</div>
+
+<div class="nav-item"
+onclick="go('index.html')">
+
+<div class="icon">⌂</div>
+<span>Dashboard</span>
+
+</div>
+
+<div class="nav-item"
+onclick="go('transactions.html')">
+
+<div class="icon">₹</div>
+<span>Transactions</span>
+
+</div>
+
+<div class="nav-item"
+onclick="go('budget.html')">
+
+<div class="icon">▣</div>
+<span>Budgets</span>
+
+</div>
+
+<div class="nav-item active">
+
+<div class="icon">◔</div>
+<span>Insights</span>
+
+</div>
+
+</aside>
+
+
+<!-- MAIN -->
+
+<main class="main">
+
+<header class="topbar">
+
+<div class="profile">
+
+<div class="avatar">
+RK
+</div>
+
+<div>
+
+<strong>Renuga Sri</strong>
+
+<br>
+
+<small>MyBudget User</small>
+
+</div>
+
+</div>
+
+</header>
+
+
+<section class="content">
+
+<!-- HEADER -->
+
+<div class="page-header">
+
+<div>
+
+<h1>Spending Insights</h1>
+
+<p>
+Understand your spending for the month.
+</p>
+
+</div>
+
+<select
+class="month-select"
+id="monthSelect"
+onchange="changeMonth()">
+
+<option value="August 2026">
+August 2026
+</option>
+
+<option value="July 2026">
+July 2026
+</option>
+
+<option value="June 2026">
+June 2026
+</option>
+
+</select>
+
+</div>
+
+
+<!-- SUMMARY -->
+
+<div class="summary">
+
+<div class="card">
+
+<div class="card-title">
+Total Income
+</div>
+
+<div class="card-value green">
+₹50,000
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="card-title">
+Total Spending
+</div>
+
+<div class="card-value red">
+₹3,800
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="card-title">
+Remaining
+</div>
+
+<div class="card-value green">
+₹46,200
+</div>
+
+</div>
+
+</div>
+
+
+<!-- INSIGHTS -->
+
+<div class="insights-grid">
+
+
+<!-- CATEGORY SPENDING -->
+
+<div class="section">
+
+<h2>
+Spending by Category
+</h2>
+
+
+<div class="category-row">
+
+<div class="category-top">
+
+<span class="category-name">
+Food
+</span>
+
+<span class="category-amount">
+₹2,500
+</span>
+
+</div>
+
+<div class="progress">
+
+<div
+class="progress-bar"
+style="width:60%">
+</div>
+
+</div>
+
+</div>
+
+
+<div class="category-row">
+
+<div class="category-top">
+
+<span class="category-name">
+Transport
+</span>
+
+<span class="category-amount">
+₹1,200
+</span>
+
+</div>
+
+<div class="progress">
+
+<div
+class="progress-bar"
+style="width:35%">
+</div>
+
+</div>
+
+</div>
+
+
+<div class="category-row">
+
+<div class="category-top">
+
+<span class="category-name">
+Education
+</span>
+
+<span class="category-amount">
+₹1,200
+</span>
+
+</div>
+
+<div class="progress">
+
+<div
+class="progress-bar"
+style="width:35%">
+</div>
+
+</div>
+
+</div>
+
+
+<div class="category-row">
+
+<div class="category-top">
+
+<span class="category-name">
+Shopping
+</span>
+
+<span class="category-amount">
+₹1,800
+</span>
+
+</div>
+
+<div class="progress">
+
+<div
+class="progress-bar"
+style="width:45%">
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- MONTHLY REPORT -->
+
+<div class="section">
+
+<h2>
+Monthly Report
+</h2>
+
+
+<div class="report-row">
+
+<span class="report-label">
+Income
+</span>
+
+<span class="report-value green">
+₹50,000
+</span>
+
+</div>
+
+
+<div class="report-row">
+
+<span class="report-label">
+Expenses
+</span>
+
+<span class="report-value red">
+₹3,800
+</span>
+
+</div>
+
+
+<div class="report-row">
+
+<span class="report-label">
+Savings
+</span>
+
+<span class="report-value green">
+₹46,200
+</span>
+
+</div>
+
+
+<div class="report-row">
+
+<span class="report-label">
+Highest Category
+</span>
+
+<span class="report-value">
+Food
+</span>
+
+</div>
+
+
+<div class="report-row">
+
+<span class="report-label">
+Budget Status
+</span>
+
+<span class="report-value green">
+Within Budget
+</span>
+
+</div>
+
+
+<div class="insight-box">
+
+Your highest spending category this month is
+<strong>Food</strong>.
+You are currently within your monthly budget.
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+
+<script>
+
+/* SHARED DATA */
+
+var transactions =
+JSON.parse(
+    localStorage.getItem("myBudgetTransactions")
+) || [];
+
+var budgets =
+JSON.parse(
+    localStorage.getItem("myBudgetBudgets")
+) || [];
+
+
+/* UPDATE INSIGHTS */
+
+function updateInsights(){
+
+    let income = 0;
+    let expenses = 0;
+
+    let categoryTotals = {
+        Food: 0,
+        Transport: 0,
+        Shopping: 0,
+        Education: 0,
+        Bills: 0
+    };
+    window.addEventListener(
+    "pageshow",
+    function(){
+
+        transactions =
+            JSON.parse(
+                localStorage.getItem(
+                    "myBudgetTransactions"
+                )
+            ) || [];
+
+        budgets =
+            JSON.parse(
+                localStorage.getItem(
+                    "myBudgetBudgets"
+                )
+            ) || [];
+
+        updateInsights();
+
+    }
+);
+
+
+    /* CALCULATE TRANSACTIONS */
+
+    transactions.forEach(item => {
+
+        const amount = Number(item.amount);
+
+        if(item.type === "income"){
+
+            income += amount;
+
+        }else{
+
+            expenses += amount;
+
+            if(
+                categoryTotals
+                .hasOwnProperty(item.category)
+            ){
+
+                categoryTotals[item.category]
+                    += amount;
+
+            }
+
+        }
+
+    });
+
+
+    const remaining =
+        income - expenses;
+
+
+    /* UPDATE SUMMARY CARDS */
+
+    const cards =
+        document.getElementById("page-insights")?.querySelectorAll(".card-value") || [];
+
+
+    if(cards.length >= 3){
+
+        cards[0].innerText =
+            "₹" +
+            income.toLocaleString("en-IN");
+
+        cards[1].innerText =
+            "₹" +
+            expenses.toLocaleString("en-IN");
+
+        cards[2].innerText =
+            "₹" +
+            remaining.toLocaleString("en-IN");
+
+    }
+
+
+    /* FIND HIGHEST CATEGORY */
+
+    let highestCategory = "None";
+    let highestAmount = 0;
+
+
+    Object.keys(categoryTotals)
+        .forEach(category => {
+
+            if(
+                categoryTotals[category]
+                > highestAmount
+            ){
+
+                highestAmount =
+                    categoryTotals[category];
+
+                highestCategory =
+                    category;
+
+            }
+
+        });
+
+
+    /* UPDATE CATEGORY AMOUNTS */
+
+    const categoryRows =
+        document.querySelectorAll(
+            ".category-row"
+        );
+
+
+    categoryRows.forEach(row => {
+
+        const name =
+            row.querySelector(
+                ".category-name"
+            );
+
+        const amount =
+            row.querySelector(
+                ".category-amount"
+            );
+
+        const bar =
+            row.querySelector(
+                ".progress-bar"
+            );
+
+
+        if(!name) return;
+
+
+        const category =
+            name.innerText.trim();
+
+
+        const value =
+            categoryTotals[category] || 0;
+
+
+        if(amount){
+
+            amount.innerText =
+                "₹" +
+                value.toLocaleString("en-IN");
+
+        }
+
+
+        /* Percentage based on total spending */
+
+        let percentage = 0;
+
+        if(expenses > 0){
+
+            percentage =
+                (value / expenses) * 100;
+
+        }
+
+
+        if(bar){
+
+            bar.style.width =
+                Math.min(
+                    percentage,
+                    100
+                ) + "%";
+
+        }
+
+    });
+
+
+    /* UPDATE MONTHLY REPORT */
+
+    const reportRows =
+        document.querySelectorAll(
+            ".report-row"
+        );
+
+
+    reportRows.forEach(row => {
+
+        const label =
+            row.querySelector(
+                ".report-label"
+            );
+
+        const value =
+            row.querySelector(
+                ".report-value"
+            );
+
+
+        if(!label || !value)
+            return;
+
+
+        const text =
+            label.innerText.trim();
+
+
+        if(text === "Income"){
+
+            value.innerText =
+                "₹" +
+                income.toLocaleString("en-IN");
+
+        }
+
+
+        if(text === "Expenses"){
+
+            value.innerText =
+                "₹" +
+                expenses.toLocaleString("en-IN");
+
+        }
+
+
+        if(text === "Savings"){
+
+            value.innerText =
+                "₹" +
+                Math.max(
+                    remaining,
+                    0
+                ).toLocaleString("en-IN");
+
+        }
+
+
+        if(text === "Highest Category"){
+
+            value.innerText =
+                highestCategory;
+
+        }
+
+
+        if(text === "Budget Status"){
+
+            const totalBudget =
+                budgets.reduce(
+                    (total,item) =>
+                    total +
+                    Number(item.limit),
+                    0
+                );
+
+
+            if(totalBudget === 0){
+
+                value.innerText =
+                    "No Budget Set";
+
+                value.className =
+                    "report-value";
+
+            }
+            else if(expenses <= totalBudget){
+
+                value.innerText =
+                    "Within Budget";
+
+                value.className =
+                    "report-value green";
+
+            }
+            else{
+
+                value.innerText =
+                    "Over Budget";
+
+                value.className =
+                    "report-value red";
+
+            }
+
+        }
+
+    });
+
+
+    /* UPDATE INSIGHT MESSAGE */
+
+    const insightBox =
+        document.querySelector(
+            ".insight-box"
+        );
+
+
+    if(insightBox){
+
+        if(expenses === 0){
+
+            insightBox.innerHTML =
+                "No spending data available yet.";
+
+        }
+        else{
+
+            insightBox.innerHTML =
+                `Your highest spending category
+                this month is
+                <strong>${highestCategory}</strong>.
+                Your total spending is
+                <strong>₹${expenses.toLocaleString("en-IN")}</strong>.`;
+
+        }
+
+    }
+
+}
+
+
+/* NAVIGATION */
+
+function go(page){
+    const pageName = page.replace('.html', '');
+    showPage(pageName);
+}
+
+
+/* MONTH SELECT */
+
+function changeMonth(){
+
+    const month =
+        document.getElementById(
+            "monthSelect"
+        ).value;
+
+    alert(
+        "Showing insights for " + month
+    );
+
+}
+
+
+/* LOAD DATA */
+
+updateInsights();
+
+</script>
+
+
+</section>
+<script>
+
+/* ===== index.html ===== */
+
+
+/* LOAD SHARED DATA */
+
+function getTransactions(){
+
+    return JSON.parse(
+        localStorage.getItem(
+            "myBudgetTransactions"
+        )
+    ) || [];
+
+}
+
+
+/* UPDATE DASHBOARD */
+
+function updateDashboard(){
+
+    const transactions =
+        getTransactions();
+
+
+    let income = 0;
+    let expenses = 0;
+
+
+    transactions.forEach(item => {
+
+        const amount =
+            Number(item.amount) || 0;
+
+
+        if(item.type === "income"){
+
+            income += amount;
+
+        }else{
+
+            expenses += amount;
+
+        }
+
+    });
+
+
+    const balance =
+        income - expenses;
+
+
+    /* SUMMARY CARDS */
+
+    const cards =
+        document.querySelectorAll(
+            ".card-value"
+        );
+
+
+    if(cards.length >= 3){
+
+        cards[0].innerText =
+            "₹" +
+            balance.toLocaleString("en-IN");
+
+        cards[1].innerText =
+            "₹" +
+            income.toLocaleString("en-IN");
+
+        cards[2].innerText =
+            "₹" +
+            expenses.toLocaleString("en-IN");
+
+    }
+
+
+    /* RECENT TRANSACTIONS */
+
+    const section =
+        document.querySelector(
+            ".section"
+        );
+
+
+    if(!section)
+        return;
+
+
+    const old =
+        section.querySelectorAll(
+            ".transaction"
+        );
+
+
+    old.forEach(item => {
+        item.remove();
+    });
+
+
+    const recent =
+        [...transactions]
+        .sort(
+            (a,b) =>
+            new Date(b.date) -
+            new Date(a.date)
+        )
+        .slice(0,5);
+
+
+    recent.forEach(item => {
+
+        let icon = "💳";
+
+
+        if(item.category === "Food")
+            icon = "🍔";
+
+        if(item.category === "Transport")
+            icon = "🚌";
+
+        if(item.category === "Shopping")
+            icon = "🛍️";
+
+        if(item.category === "Education")
+            icon = "📚";
+
+        if(item.category === "Bills")
+            icon = "📄";
+
+
+        const sign =
+            item.type === "income"
+            ? "+"
+            : "-";
+
+
+        const amountClass =
+            item.type === "income"
+            ? "income"
+            : "expense";
+
+
+        section.insertAdjacentHTML(
+            "beforeend",
+
+            `
+            <div class="transaction">
+
+                <div class="transaction-left">
+
+                    <div class="transaction-icon">
+                        ${icon}
+                    </div>
+
+                    <div>
+
+                        <div class="transaction-name">
+                            ${item.name}
+                        </div>
+
+                        <div class="transaction-category">
+                            ${item.category}
+                            •
+                            ${item.date}
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="amount ${amountClass}">
+                    ${sign}
+                    ₹${Number(item.amount)
+                    .toLocaleString("en-IN")}
+                </div>
+
+            </div>
+            `
+        );
+
+    });
+
+}
+
+
+/* NAVIGATION */
+
+function go(page){
+
+    window.location.href =
+        page;
+
+}
+
+
+/* REFRESH WHEN PAGE OPENS */
+
+updateDashboard();
+
+
+/* REFRESH WHEN USER RETURNS TO DASHBOARD */
+
+window.addEventListener(
+    "pageshow",
+    updateDashboard
+);
+
+
+
+/* ===== transactions.html ===== */
+
+
+/* =========================
+   LOAD SHARED TRANSACTIONS
+========================= */
+
+var transactions =
+JSON.parse(
+    localStorage.getItem(
+        "myBudgetTransactions"
+    )
+) || [];
+
+
+/* =========================
+   DISPLAY TRANSACTIONS
+========================= */
+
+function displayTransactions(data){
+
+    const list =
+        document.getElementById(
+            "transactionList"
+        );
+
+    list.innerHTML = "";
+
+
+    if(data.length === 0){
+
+        list.innerHTML = `
+
+            <div class="empty">
+
+                No transactions found.
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    data.forEach(item => {
+
+        const realIndex =
+            transactions.indexOf(item);
+
+
+        let icon = "💳";
+
+
+        if(item.category === "Food")
+            icon = "🍔";
+
+        if(item.category === "Transport")
+            icon = "🚌";
+
+        if(item.category === "Shopping")
+            icon = "🛍️";
+
+        if(item.category === "Education")
+            icon = "📚";
+
+        if(item.category === "Bills")
+            icon = "📄";
+
+
+        const sign =
+            item.type === "income"
+            ? "+"
+            : "-";
+
+
+        const amountClass =
+            item.type === "income"
+            ? "income"
+            : "expense";
+
+
+        list.innerHTML += `
+
+        <div class="transaction">
+
+
+            <div class="transaction-left">
+
+
+                <div class="transaction-icon">
+
+                    ${icon}
+
+                </div>
+
+
+                <div>
+
+                    <div class="transaction-name">
+
+                        ${item.name}
+
+                    </div>
+
+
+                    <div class="transaction-info">
+
+                        ${item.category}
+                        •
+                        ${item.date}
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="amount-area">
+
+
+                <div class="amount ${amountClass}">
+
+                    ${sign}
+                    ₹${Number(item.amount)
+                    .toLocaleString("en-IN")}
+
+                </div>
+
+
+                <button
+                    class="delete-btn"
+                    onclick="deleteTransaction(${realIndex})">
+
+                    🗑️
+
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+        `;
+
+    });
+
+}
+
+
+/* =========================
+   SEARCH + FILTER
+========================= */
+
+function filterTransactions(){
+
+    const search =
+        document.getElementById(
+            "searchInput"
+        ).value
+        .toLowerCase()
+        .trim();
+
+
+    const category =
+        document.getElementById(
+            "categoryFilter"
+        ).value;
+
+
+    const type =
+        document.getElementById(
+            "typeFilter"
+        ).value;
+
+
+    const filtered =
+        transactions.filter(item => {
+
+
+            const searchMatch =
+                item.name
+                .toLowerCase()
+                .includes(search);
+
+
+            const categoryMatch =
+                category === "all" ||
+                item.category === category;
+
+
+            const typeMatch =
+                type === "all" ||
+                item.type === type;
+
+
+            return (
+                searchMatch &&
+                categoryMatch &&
+                typeMatch
+            );
+
+        });
+
+
+    displayTransactions(filtered);
+
+}
+
+
+/* =========================
+   DELETE TRANSACTION
+========================= */
+
+function deleteTransaction(index){
+
+    if(index < 0)
+        return;
+
+
+    const item =
+        transactions[index];
+
+
+    const confirmed =
+        confirm(
+            "Delete " +
+            item.name +
+            " transaction?"
+        );
+
+
+    if(!confirmed)
+        return;
+
+
+    transactions.splice(
+        index,
+        1
+    );
+
+
+    localStorage.setItem(
+        "myBudgetTransactions",
+        JSON.stringify(
+            transactions
+        )
+    );
+
+
+    filterTransactions();
+
+}
+
+
+/* =========================
+   OPEN MODAL
+========================= */
+
+function openModal(){
+
+    document.getElementById(
+        "modal"
+    ).style.display = "flex";
+
+
+    document.getElementById(
+        "date"
+    ).value =
+        new Date()
+        .toISOString()
+        .split("T")[0];
+
+}
+
+
+/* =========================
+   CLOSE MODAL
+========================= */
+
+function closeModal(){
+
+    document.getElementById(
+        "modal"
+    ).style.display = "none";
+
+}
+
+
+/* =========================
+   ADD EXPENSE
+========================= */
+
+function addExpense(){
+
+    const name =
+        document.getElementById(
+            "name"
+        ).value.trim();
+
+
+    const amount =
+        Number(
+            document.getElementById(
+                "amount"
+            ).value
+        );
+
+
+    const category =
+        document.getElementById(
+            "category"
+        ).value;
+
+
+    const date =
+        document.getElementById(
+            "date"
+        ).value;
+
+
+    if(name === ""){
+
+        alert(
+            "Please enter a description."
+        );
+
+        return;
+
+    }
+
+
+    if(!amount || amount <= 0){
+
+        alert(
+            "Please enter a valid amount."
+        );
+
+        return;
+
+    }
+
+
+    if(date === ""){
+
+        alert(
+            "Please select a date."
+        );
+
+        return;
+
+    }
+
+
+    transactions.push({
+
+        name:name,
+
+        amount:amount,
+
+        category:category,
+
+        type:"expense",
+
+        date:date
+
+    });
+
+
+    localStorage.setItem(
+        "myBudgetTransactions",
+        JSON.stringify(
+            transactions
+        )
+    );
+
+
+    document.getElementById(
+        "name"
+    ).value = "";
+
+
+    document.getElementById(
+        "amount"
+    ).value = "";
+
+
+    closeModal();
+
+
+    filterTransactions();
+
+}
+
+
+/* =========================
+   PAGE NAVIGATION
+========================= */
+
+function go(page){
+
+    window.location.href =
+        page;
+
+}
+
+
+/* =========================
+   INITIAL LOAD
+========================= */
+
+displayTransactions(
+    transactions
+);
+
+
+
+/* ===== budget.html ===== */
+
+
+/* SHARED DATA */
+
+var transactions =
+JSON.parse(
+    localStorage.getItem("myBudgetTransactions")
+) || [];
+
+var budgets =
+JSON.parse(
+    localStorage.getItem("myBudgetBudgets")
+) || [
+
+    {
+        category:"Food",
+        limit:5000
+    },
+
+    {
+        category:"Transport",
+        limit:3000
+    },
+
+    {
+        category:"Shopping",
+        limit:4000
+    },
+
+    {
+        category:"Education",
+        limit:3000
+    },
+
+    {
+        category:"Bills",
+        limit:5000
+    }
+
+];
+
+
+/* CALCULATE SPENDING */
+
+function getSpent(category){
+
+    return transactions
+        .filter(item =>
+            item.type === "expense" &&
+            item.category === category
+        )
+        .reduce(
+            (total,item) =>
+            total + Number(item.amount),
+            0
+        );
+
+}
+
+
+/* DISPLAY BUDGETS */
+
+function displayBudgets(){
+
+    const list =
+        document.getElementById("budgetList");
+
+    list.innerHTML = "";
+
+    let totalLimit = 0;
+    let totalSpent = 0;
+
+
+    budgets.forEach(item => {
+
+        const spent =
+            getSpent(item.category);
+
+        const limit =
+            Number(item.limit);
+
+        totalLimit += limit;
+        totalSpent += spent;
+
+
+        let percentage =
+            limit > 0
+            ? (spent / limit) * 100
+            : 0;
+
+
+        const displayPercentage =
+            Math.min(percentage,100);
+
+
+        let barClass = "";
+
+        if(
+            percentage >= 80 &&
+            percentage < 100
+        ){
+            barClass = "warning";
+        }
+
+        if(percentage >= 100){
+            barClass = "danger";
+        }
+
+
+        const remaining =
+            limit - spent;
+
+
+        list.innerHTML += `
+
+        <div class="budget-item">
+
+            <div class="budget-top">
+
+                <div class="category">
+                    ${item.category}
+                </div>
+
+                <div class="amount-text">
+                    ₹${spent.toLocaleString("en-IN")}
+                    /
+                    ₹${limit.toLocaleString("en-IN")}
+                </div>
+
+            </div>
+
+
+            <div class="progress">
+
+                <div
+                    class="progress-bar ${barClass}"
+                    style="width:${displayPercentage}%">
+                </div>
+
+            </div>
+
+
+            <div class="remaining">
+
+                ${
+                    remaining >= 0
+
+                    ? "₹" +
+                      remaining.toLocaleString("en-IN") +
+                      " remaining"
+
+                    : "Budget exceeded by ₹" +
+                      Math.abs(remaining)
+                      .toLocaleString("en-IN")
+                }
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+
+    const remainingTotal =
+        Math.max(
+            totalLimit - totalSpent,
+            0
+        );
+
+
+    document.getElementById(
+        "remainingTotal"
+    ).innerText =
+        "₹" +
+        remainingTotal.toLocaleString("en-IN");
+
+}
+window.addEventListener(
+    "pageshow",
+    function(){
+
+        transactions =
+            JSON.parse(
+                localStorage.getItem(
+                    "myBudgetTransactions"
+                )
+            ) || [];
+
+        budgets =
+            JSON.parse(
+                localStorage.getItem(
+                    "myBudgetBudgets"
+                )
+            ) || [];
+
+        displayBudgets();
+
+    }
+);
+
+
+/* OPEN MODAL */
+
+function openModal(){
+
+    document.getElementById(
+        "modal"
+    ).style.display = "flex";
+
+}
+
+
+/* CLOSE MODAL */
+
+function closeModal(){
+
+    document.getElementById(
+        "modal"
+    ).style.display = "none";
+
+}
+
+
+/* SAVE / UPDATE BUDGET */
+
+function saveBudget(){
+
+    const category =
+        document.getElementById(
+            "budgetCategory"
+        ).value;
+
+
+    const amount =
+        Number(
+            document.getElementById(
+                "budgetAmount"
+            ).value
+        );
+
+
+    if(!amount || amount <= 0){
+
+        alert(
+            "Please enter a valid budget amount."
+        );
+
+        return;
+
+    }
+
+
+    const existing =
+        budgets.find(
+            item =>
+            item.category === category
+        );
+
+
+    if(existing){
+
+        existing.limit = amount;
+
+    }else{
+
+        budgets.push({
+
+            category: category,
+
+            limit: amount
+
+        });
+
+    }
+
+
+    /* SAVE BUDGET */
+
+    localStorage.setItem(
+        "myBudgetBudgets",
+        JSON.stringify(budgets)
+    );
+
+
+    displayBudgets();
+
+
+    document.getElementById(
+        "budgetAmount"
+    ).value = "";
+
+
+    closeBudgetModal();
+
+}
+
+
+/* NAVIGATION */
+
+function go(page){
+    const pageName = page.replace('.html', '');
+    showPage(pageName);
+}
+
+
+/* INITIAL LOAD */
+
+displayBudgets();
+
+
+
+/* ===== insights.html ===== */
+
+
+/* SHARED DATA */
+
+var transactions =
+JSON.parse(
+    localStorage.getItem("myBudgetTransactions")
+) || [];
+
+var budgets =
+JSON.parse(
+    localStorage.getItem("myBudgetBudgets")
+) || [];
+
+
+/* UPDATE INSIGHTS */
+
+function updateInsights(){
+
+    let income = 0;
+    let expenses = 0;
+
+    let categoryTotals = {
+        Food: 0,
+        Transport: 0,
+        Shopping: 0,
+        Education: 0,
+        Bills: 0
+    };
+    window.addEventListener(
+    "pageshow",
+    function(){
+
+        transactions =
+            JSON.parse(
+                localStorage.getItem(
+                    "myBudgetTransactions"
+                )
+            ) || [];
+
+        budgets =
+            JSON.parse(
+                localStorage.getItem(
+                    "myBudgetBudgets"
+                )
+            ) || [];
+
+        updateInsights();
+
+    }
+);
+
+
+    /* CALCULATE TRANSACTIONS */
+
+    transactions.forEach(item => {
+
+        const amount = Number(item.amount);
+
+        if(item.type === "income"){
+
+            income += amount;
+
+        }else{
+
+            expenses += amount;
+
+            if(
+                categoryTotals
+                .hasOwnProperty(item.category)
+            ){
+
+                categoryTotals[item.category]
+                    += amount;
+
+            }
+
+        }
+
+    });
+
+
+    const remaining =
+        income - expenses;
+
+
+    /* UPDATE SUMMARY CARDS */
+
+    const cards =
+        document.getElementById("page-insights")?.querySelectorAll(".card-value") || [];
+
+
+    if(cards.length >= 3){
+
+        cards[0].innerText =
+            "₹" +
+            income.toLocaleString("en-IN");
+
+        cards[1].innerText =
+            "₹" +
+            expenses.toLocaleString("en-IN");
+
+        cards[2].innerText =
+            "₹" +
+            remaining.toLocaleString("en-IN");
+
+    }
+
+
+    /* FIND HIGHEST CATEGORY */
+
+    let highestCategory = "None";
+    let highestAmount = 0;
+
+
+    Object.keys(categoryTotals)
+        .forEach(category => {
+
+            if(
+                categoryTotals[category]
+                > highestAmount
+            ){
+
+                highestAmount =
+                    categoryTotals[category];
+
+                highestCategory =
+                    category;
+
+            }
+
+        });
+
+
+    /* UPDATE CATEGORY AMOUNTS */
+
+    const categoryRows =
+        document.querySelectorAll(
+            ".category-row"
+        );
+
+
+    categoryRows.forEach(row => {
+
+        const name =
+            row.querySelector(
+                ".category-name"
+            );
+
+        const amount =
+            row.querySelector(
+                ".category-amount"
+            );
+
+        const bar =
+            row.querySelector(
+                ".progress-bar"
+            );
+
+
+        if(!name) return;
+
+
+        const category =
+            name.innerText.trim();
+
+
+        const value =
+            categoryTotals[category] || 0;
+
+
+        if(amount){
+
+            amount.innerText =
+                "₹" +
+                value.toLocaleString("en-IN");
+
+        }
+
+
+        /* Percentage based on total spending */
+
+        let percentage = 0;
+
+        if(expenses > 0){
+
+            percentage =
+                (value / expenses) * 100;
+
+        }
+
+
+        if(bar){
+
+            bar.style.width =
+                Math.min(
+                    percentage,
+                    100
+                ) + "%";
+
+        }
+
+    });
+
+
+    /* UPDATE MONTHLY REPORT */
+
+    const reportRows =
+        document.querySelectorAll(
+            ".report-row"
+        );
+
+
+    reportRows.forEach(row => {
+
+        const label =
+            row.querySelector(
+                ".report-label"
+            );
+
+        const value =
+            row.querySelector(
+                ".report-value"
+            );
+
+
+        if(!label || !value)
+            return;
+
+
+        const text =
+            label.innerText.trim();
+
+
+        if(text === "Income"){
+
+            value.innerText =
+                "₹" +
+                income.toLocaleString("en-IN");
+
+        }
+
+
+        if(text === "Expenses"){
+
+            value.innerText =
+                "₹" +
+                expenses.toLocaleString("en-IN");
+
+        }
+
+
+        if(text === "Savings"){
+
+            value.innerText =
+                "₹" +
+                Math.max(
+                    remaining,
+                    0
+                ).toLocaleString("en-IN");
+
+        }
+
+
+        if(text === "Highest Category"){
+
+            value.innerText =
+                highestCategory;
+
+        }
+
+
+        if(text === "Budget Status"){
+
+            const totalBudget =
+                budgets.reduce(
+                    (total,item) =>
+                    total +
+                    Number(item.limit),
+                    0
+                );
+
+
+            if(totalBudget === 0){
+
+                value.innerText =
+                    "No Budget Set";
+
+                value.className =
+                    "report-value";
+
+            }
+            else if(expenses <= totalBudget){
+
+                value.innerText =
+                    "Within Budget";
+
+                value.className =
+                    "report-value green";
+
+            }
+            else{
+
+                value.innerText =
+                    "Over Budget";
+
+                value.className =
+                    "report-value red";
+
+            }
+
+        }
+
+    });
+
+
+    /* UPDATE INSIGHT MESSAGE */
+
+    const insightBox =
+        document.querySelector(
+            ".insight-box"
+        );
+
+
+    if(insightBox){
+
+        if(expenses === 0){
+
+            insightBox.innerHTML =
+                "No spending data available yet.";
+
+        }
+        else{
+
+            insightBox.innerHTML =
+                `Your highest spending category
+                this month is
+                <strong>${highestCategory}</strong>.
+                Your total spending is
+                <strong>₹${expenses.toLocaleString("en-IN")}</strong>.`;
+
+        }
+
+    }
+
+}
+
+
+/* LOAD DATA */
+
+updateInsights();
+
+
+function showPage(page){
+    document.querySelectorAll('.page-section').forEach(s => s.style.display='none');
+    const target=document.getElementById('page-'+page);
+    if(target) target.style.display='block';
+    document.querySelectorAll('.page-section .nav-item').forEach(n => n.classList.remove('active'));
+    if(target){
+        target.querySelectorAll('.nav-item').forEach(n=>{
+            const text=(n.innerText||'').trim().toLowerCase();
+            if((page==='index' && text.includes('dashboard')) ||
+               (page==='transactions' && text.includes('transactions')) ||
+               (page==='budget' && text.includes('budgets')) ||
+               (page==='insights' && text.includes('insights'))){
+                n.classList.add('active');
+            }
+        });
+    }
+    window.scrollTo(0,0);
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+    showPage('index');
+});
+
+</script>
+<script>
+// Final initializer: seed the correct starting data and keep every page synchronized.
+(function(){
+    var seededTransactions = [
+        { name: 'Salary', amount: 50000, category: 'Salary', type: 'income', date: '2026-08-01' },
+        { name: 'Food', amount: 800, category: 'Food', type: 'expense', date: '2026-08-10' },
+        { name: 'Transport', amount: 500, category: 'Transport', type: 'expense', date: '2026-08-09' },
+        { name: 'Education', amount: 1200, category: 'Education', type: 'expense', date: '2026-08-05' },
+        { name: 'Shopping', amount: 700, category: 'Shopping', type: 'expense', date: '2026-08-03' },
+        { name: 'Bills', amount: 600, category: 'Bills', type: 'expense', date: '2026-08-02' }
+    ];
+
+    var oldSeedTransactions = [
+        { name: 'Salary', amount: 50000, category: 'Salary', type: 'income', date: '2026-08-01' },
+        { name: 'Food', amount: 2500, category: 'Food', type: 'expense', date: '2026-08-10' },
+        { name: 'Transport', amount: 1200, category: 'Transport', type: 'expense', date: '2026-08-09' },
+        { name: 'Education', amount: 1200, category: 'Education', type: 'expense', date: '2026-08-05' },
+        { name: 'Shopping', amount: 1800, category: 'Shopping', type: 'expense', date: '2026-08-03' },
+        { name: 'Bills', amount: 800, category: 'Bills', type: 'expense', date: '2026-08-02' }
+    ];
+
+    var seededBudgets = [
+        {category:'Food', limit:5000},
+        {category:'Transport', limit:3000},
+        {category:'Shopping', limit:4000},
+        {category:'Education', limit:3000},
+        {category:'Bills', limit:5000}
+    ];
+
+    function sameTransactions(a,b){
+        try {
+            return JSON.stringify(a) === JSON.stringify(b);
+        } catch(e) {
+            return false;
+        }
+    }
+
+    function refreshMyBudgetUI(){
+        try{
+            window.transactions = JSON.parse(localStorage.getItem('myBudgetTransactions')) || [];
+            window.budgets = JSON.parse(localStorage.getItem('myBudgetBudgets')) || [];
+
+            if(typeof updateDashboard === 'function') updateDashboard();
+            if(typeof displayTransactions === 'function' && document.getElementById('transactionList')){
+                displayTransactions(window.transactions);
+            }
+            if(typeof displayBudgets === 'function' && document.getElementById('budgetList')) displayBudgets();
+            if(typeof updateInsights === 'function') updateInsights();
+        }catch(e){
+            console.error('UI refresh error:', e);
+        }
+    }
+
+    window.refreshMyBudgetUI = refreshMyBudgetUI;
+
+    try{
+        var stored = localStorage.getItem('myBudgetTransactions');
+        var existing = stored ? JSON.parse(stored) : null;
+
+        // Create the requested starting state, or migrate the previous demo seed.
+        if(!stored || sameTransactions(existing, oldSeedTransactions)){
+            localStorage.setItem('myBudgetTransactions', JSON.stringify(seededTransactions));
+        }
+
+        if(!localStorage.getItem('myBudgetBudgets')){
+            localStorage.setItem('myBudgetBudgets', JSON.stringify(seededBudgets));
+        }
+
+        refreshMyBudgetUI();
+        showPage('index');
+    }catch(e){
+        console.error('Initializer error:', e);
+    }
+})();
+
+// Any add/delete action or returning to the page recalculates everything from stored transactions.
+window.addEventListener('pageshow', function(){
+    if(typeof refreshMyBudgetUI === 'function') refreshMyBudgetUI();
+});
+</script>
+<script>
+/* FINAL BUDGET MODAL FIX */
+function openBudgetModal(){
+    const modal = document.getElementById("budgetModal");
+    if(modal){
+        modal.style.display = "flex";
+    }
+}
+function closeBudgetModal(){
+    const modal = document.getElementById("budgetModal");
+    if(modal){
+        modal.style.display = "none";
+    }
+}
+</script>
+</body>
+</html>
